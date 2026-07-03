@@ -122,6 +122,7 @@ def planet_mass(name):
         "Saturn": 568.34,
         "Uranus": 86.813,
         "Neptune": 102.413,
+        "Pluto":0.0130900
     }
     return f"{name} has a mass of {masses[name]} × 10^24 kg"
 
@@ -184,37 +185,69 @@ agent = Agent(system=prompt)
 # )  # The combined mass of Earth and Mars is 6.61371 × 10^24 kg
 # # ----- Complext query END ------
 
-# ----- Final solution - Automate our AI Agent ------
-# Create a loop to automate the agent until the agent returns an answer
+# # ----- Final solution - Automate our AI Agent ------
+# # Create a loop to automate the agent until the agent returns an answer
 
 import re
 
 action_re = re.compile(r"^Action: (\w+): (.*)$")
 
 
-# Create a query function
-def query(question, max_turns=10):
-    i = 0
+# # Create a query function
+# def query(question, max_turns=10):
+#     i = 0
+#     bot = Agent(prompt)
+#     next_prompt = question
+#     while i < max_turns:
+#         i += 1
+#         result = bot(next_prompt)
+#         print(result)
+#         actions = [action_re.match(a) for a in result.split("\n") if action_re.match(a)]
+#         if actions:
+#             # There is an action to run
+#             action, action_input = actions[0].groups()
+#             if action not in known_actions:
+#                 raise Exception("Unknown action: {}: {}".format(action, action_input))
+#             print(" -- running {} {}".format(action, action_input))
+#             observation = known_actions[action](action_input)
+#             print("Observation:", observation)
+#             next_prompt = "Observation: {}".format(observation)
+#         else:
+#             return
+
+
+# # New Scenario: Calculating Combined Mass of Earth and Jupiter
+# question = "What is the combined mass of Earth and Jupiter and Saturn and Venus?"
+# query(question)
+
+# Function to handle the interactive query
+def query_interactive():
     bot = Agent(prompt)
-    next_prompt = question
+    max_turns = int(input("Enter the maximum number of turns: "))
+    i = 0
+
     while i < max_turns:
         i += 1
-        result = bot(next_prompt)
-        print(result)
+        question = input("You: ")
+        result = bot(question)
+        print("Bot:", result)
+
         actions = [action_re.match(a) for a in result.split("\n") if action_re.match(a)]
         if actions:
-            # There is an action to run
             action, action_input = actions[0].groups()
             if action not in known_actions:
-                raise Exception("Unknown action: {}: {}".format(action, action_input))
-            print(" -- running {} {}".format(action, action_input))
+                print(f"Unknown action: {action}: {action_input}")
+                continue
+            print(f" -- running {action} {action_input}")
             observation = known_actions[action](action_input)
             print("Observation:", observation)
-            next_prompt = "Observation: {}".format(observation)
+            next_prompt = f"Observation: {observation}"
+            result = bot(next_prompt)
+            print("Bot:", result)
         else:
-            return
+            print("No actions to run.")
+            break
 
 
-# New Scenario: Calculating Combined Mass of Earth and Jupiter
-question = "What is the combined mass of Earth and Jupiter and Saturn and Venus?"
-query(question)
+if __name__ == "__main__":
+    query_interactive()
