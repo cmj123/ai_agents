@@ -143,43 +143,78 @@ agent = Agent(system=prompt)
 # response = agent(next_response)
 # print(response)
 
-# ----- Complext query ------
-# Complex query
-question = "What is the combined mass of Saturn and Jupiter and Earth?"
-response = agent(question)
+# # ----- Complext query ------
+# # Complex query
+# question = "What is the combined mass of Saturn and Jupiter and Earth?"
+# response = agent(question)
 
-print(response)
+# print(response)
 
-next_prompt = "Observation: {}".format(planet_mass("Saturn"))
-print(next_prompt)
+# next_prompt = "Observation: {}".format(planet_mass("Saturn"))
+# print(next_prompt)
 
-# call the agent again with the next prompt
-res = agent(next_prompt)
-print(res)
-
-
-next_prompt = "Observation: {}".format(planet_mass("Jupiter"))
-print(next_prompt)
-
-# call the agent again with the next prompt
-res = agent(next_prompt)
-print(res)
+# # call the agent again with the next prompt
+# res = agent(next_prompt)
+# print(res)
 
 
-next_prompt = "Observation: {}".format(planet_mass("Earth"))
-print(next_prompt)
+# next_prompt = "Observation: {}".format(planet_mass("Jupiter"))
+# print(next_prompt)
 
-# call the agent again with the next prompt
-res = agent(next_prompt)
-print(res)
+# # call the agent again with the next prompt
+# res = agent(next_prompt)
+# print(res)
 
-# calculate the combined mass
-next_prompt = "Obseveration: {}".format(eval("568.34 + 1898.19 + 5.972"))
-print(next_prompt)
 
-# call the agent again with the next prompt
-res = agent(next_prompt)
-print(
-    f"Final answer is {res}"
-)  # The combined mass of Earth and Mars is 6.61371 × 10^24 kg
-# ----- Complext query END ------
+# next_prompt = "Observation: {}".format(planet_mass("Earth"))
+# print(next_prompt)
+
+# # call the agent again with the next prompt
+# res = agent(next_prompt)
+# print(res)
+
+# # calculate the combined mass
+# next_prompt = "Obseveration: {}".format(eval("568.34 + 1898.19 + 5.972"))
+# print(next_prompt)
+
+# # call the agent again with the next prompt
+# res = agent(next_prompt)
+# print(
+#     f"Final answer is {res}"
+# )  # The combined mass of Earth and Mars is 6.61371 × 10^24 kg
+# # ----- Complext query END ------
+
+# ----- Final solution - Automate our AI Agent ------
+# Create a loop to automate the agent until the agent returns an answer
+
+import re
+
+action_re = re.compile(r"^Action: (\w+): (.*)$")
+
+
+# Create a query function
+def query(question, max_turns=10):
+    i = 0
+    bot = Agent(prompt)
+    next_prompt = question
+    while i < max_turns:
+        i += 1
+        result = bot(next_prompt)
+        print(result)
+        actions = [action_re.match(a) for a in result.split("\n") if action_re.match(a)]
+        if actions:
+            # There is an action to run
+            action, action_input = actions[0].groups()
+            if action not in known_actions:
+                raise Exception("Unknown action: {}: {}".format(action, action_input))
+            print(" -- running {} {}".format(action, action_input))
+            observation = known_actions[action](action_input)
+            print("Observation:", observation)
+            next_prompt = "Observation: {}".format(observation)
+        else:
+            return
+
+
+# New Scenario: Calculating Combined Mass of Earth and Jupiter
+question = "What is the combined mass of Earth and Jupiter and Saturn and Venus?"
+query(question)
